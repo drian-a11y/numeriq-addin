@@ -263,6 +263,174 @@ kbd {
   gap: 20px;
 }
 
+/* Cell Info Header - Redesigned */
+.cell-info-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.cell-address-badge {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.cell-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.result-value {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+/* Formula Section - Prominent */
+.formula-section {
+  background-color: #fff;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.formula-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.formula-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #667eea;
+  margin: 0;
+}
+
+.formula-display-box {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  min-height: 60px;
+}
+
+.formula-display-box .formula-code {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #212529;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Cell References Section */
+.cell-references-section {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cell-references-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 15px;
+}
+
+.references-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.reference-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.reference-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.reference-address {
+  font-size: 13px;
+  font-weight: 700;
+  color: #667eea;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 6px;
+}
+
+.reference-value {
+  font-size: 14px;
+  color: #212529;
+  font-weight: 500;
+  word-wrap: break-word;
+}
+
+/* Formula Structure Section */
+.formula-structure-section {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.formula-structure-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 15px;
+}
+
+.no-formula {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Explorer Tip */
+.explorer-tip {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #856404;
+  font-weight: 500;
+}
+
+/* Legacy styles kept for compatibility */
 .explorer-header {
   background-color: #f8f9fa;
   padding: 15px;

@@ -36,7 +36,31 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
 
   componentDidMount() {
     this.loadCurrentCell();
+    this.setupSelectionChangeListener();
   }
+
+  componentWillUnmount() {
+    // Clean up event handler
+    if (this.selectionChangeHandler) {
+      this.selectionChangeHandler.remove();
+    }
+  }
+
+  private selectionChangeHandler: any = null;
+
+  setupSelectionChangeListener = async () => {
+    try {
+      await Excel.run(async (context) => {
+        const worksheet = context.workbook.worksheets.getActiveWorksheet();
+        this.selectionChangeHandler = worksheet.onSelectionChanged.add(async () => {
+          await this.loadCurrentCell();
+        });
+        await context.sync();
+      });
+    } catch (error) {
+      console.error('Error setting up selection listener:', error);
+    }
+  };
 
   loadCurrentCell = async () => {
     try {
@@ -203,38 +227,25 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
 
     return (
       <div className="formula-explorer" onKeyDown={this.handleKeyDown}>
-        <div className="explorer-header">
-          <h2>Formula Explorer</h2>
-          <div className="cell-info">
-            <span className="cell-address">{currentCell.sheet}!{currentCell.address}</span>
-            <span className="cell-value">Value: {String(currentCell.value)}</span>
+        {/* Cell Info Header */}
+        <div className="cell-info-header">
+          <div className="cell-address-badge">{currentCell.sheet}!{currentCell.address}</div>
+          <div className="cell-result">
+            <span className="result-label">Result:</span>
+            <span className="result-value">{String(currentCell.value)}</span>
           </div>
         </div>
 
-        <div className="formula-tree-container">
-          <h3>Formula Structure</h3>
-          <div className="formula-tree">
-            {formulaTree ? this.renderFormulaNode(formulaTree) : <p>No formula to display</p>}
+        {/* Formula Display - Prominent */}
+        <div className="formula-section">
+          <div className="formula-header">
+            <h3>Formula</h3>
+            {!isEditing && (
+              <button className="btn-icon" onClick={this.startEditing} title="Edit Formula (F2)">
+                ✏️
+              </button>
+            )}
           </div>
-        </div>
-
-        <div className="precedents-container">
-          <h3>Precedents ({selectedPrecedents.length})</h3>
-          <div className="precedents-list">
-            {selectedPrecedents.map((precedent, index) => (
-              <div key={index} className="precedent-item">
-                <span className="precedent-address">
-                  {precedent.sheet !== currentCell.sheet && `${precedent.sheet}!`}
-                  {precedent.address}
-                </span>
-                <span className="precedent-value">= {String(precedent.value)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="formula-editor-container">
-          <h3>Formula</h3>
           {isEditing ? (
             <div className="formula-editor">
               <textarea
@@ -242,7 +253,7 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
                 className="formula-input"
                 value={editedFormula}
                 onChange={this.handleFormulaChange}
-                rows={3}
+                rows={4}
               />
               <div className="editor-actions">
                 <button className="btn btn-primary" onClick={this.applyEdit}>
@@ -254,18 +265,42 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
               </div>
             </div>
           ) : (
-            <div className="formula-display">
-              <code className="formula-code">{currentCell.formula}</code>
-              <button className="btn btn-secondary" onClick={this.startEditing}>
-                Edit (F2)
-              </button>
+            <div className="formula-display-box">
+              <code className="formula-code">{currentCell.formula || '(No formula)'}</code>
             </div>
           )}
         </div>
 
+        {/* Cell References with Values */}
+        {selectedPrecedents.length > 0 && (
+          <div className="cell-references-section">
+            <h3>Cell References ({selectedPrecedents.length})</h3>
+            <div className="references-grid">
+              {selectedPrecedents.map((precedent, index) => (
+                <div key={index} className="reference-card">
+                  <div className="reference-address">
+                    {precedent.sheet !== currentCell.sheet && `${precedent.sheet}!`}
+                    {precedent.address}
+                  </div>
+                  <div className="reference-value">{String(precedent.value)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Formula Structure Tree */}
+        <div className="formula-structure-section">
+          <h3>Formula Structure</h3>
+          <div className="formula-tree">
+            {formulaTree ? this.renderFormulaNode(formulaTree) : <p className="no-formula">No formula to display</p>}
+          </div>
+        </div>
+
+        {/* Actions */}
         <div className="explorer-actions">
-          <button className="btn btn-primary" onClick={this.loadCurrentCell}>
-            Refresh (Ctrl+Q)
+          <button className="btn btn-secondary" onClick={this.loadCurrentCell}>
+            🔄 Refresh
           </button>
           <button
             className="btn btn-secondary"
@@ -275,19 +310,13 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
               });
             }}
           >
-            Back (Ctrl+Backspace)
+            ← Back
           </button>
         </div>
 
-        <div className="explorer-help">
-          <h4>Keyboard Shortcuts</h4>
-          <ul>
-            <li><kbd>Ctrl+Q</kbd> - Open Formula Explorer</li>
-            <li><kbd>F2</kbd> - Edit formula</li>
-            <li><kbd>Enter</kbd> - Apply changes</li>
-            <li><kbd>Esc</kbd> - Cancel / Close</li>
-            <li><kbd>Ctrl+Backspace</kbd> - Navigate back</li>
-          </ul>
+        {/* Help Text */}
+        <div className="explorer-tip">
+          💡 Click on any cell in Excel to automatically update this view
         </div>
       </div>
     );
