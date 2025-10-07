@@ -1,1 +1,0 @@
-Office.onReady(()=>{}),Office.actions={action:function(e){Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage,e.completed()}};
