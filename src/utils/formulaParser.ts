@@ -10,9 +10,33 @@ export interface FormulaNode {
   calculatedValue?: any;
   isActive?: boolean; // For IF, IFS, CHOOSE, SWITCH - indicates which branch is active
   targetLocation?: string; // For VLOOKUP, OFFSET, INDEX, INDIRECT
+  argumentName?: string; // For function arguments: logical_test, value_if_true, reference, rows, cols, etc.
+  location?: string; // Sheet!Address where this value comes from
 }
 
 export class FormulaParser {
+  // Map of function names to their argument names
+  private static FUNCTION_ARG_NAMES: Record<string, string[]> = {
+    'IF': ['logical_test', 'value_if_true', 'value_if_false'],
+    'IFS': ['logical_test1', 'value_if_true1', 'logical_test2', 'value_if_true2'],
+    'OFFSET': ['reference', 'rows', 'cols', 'height', 'width'],
+    'VLOOKUP': ['lookup_value', 'table_array', 'col_index_num', 'range_lookup'],
+    'HLOOKUP': ['lookup_value', 'table_array', 'row_index_num', 'range_lookup'],
+    'INDEX': ['array', 'row_num', 'column_num'],
+    'MATCH': ['lookup_value', 'lookup_array', 'match_type'],
+    'SUMIF': ['range', 'criteria', 'sum_range'],
+    'SUMIFS': ['sum_range', 'criteria_range1', 'criteria1'],
+    'COUNTIF': ['range', 'criteria'],
+    'COUNTIFS': ['criteria_range1', 'criteria1'],
+    'INDIRECT': ['ref_text', 'a1'],
+    'CHOOSE': ['index_num', 'value1', 'value2'],
+    'SWITCH': ['expression', 'value1', 'result1'],
+    'SUM': ['number1', 'number2'],
+    'AVERAGE': ['number1', 'number2'],
+    'MAX': ['number1', 'number2'],
+    'MIN': ['number1', 'number2'],
+  };
+
   /**
    * Parse a formula string into a tree structure
    */
@@ -86,7 +110,17 @@ export class FormulaParser {
     const argsString = expr.substring(argsStart, argsEnd);
     
     const args = this.splitArguments(argsString);
-    const children = args.map(arg => this.parseExpression(arg));
+    const children = args.map((arg, index) => {
+      const childNode = this.parseExpression(arg);
+      
+      // Assign argument name if available
+      const argNames = this.FUNCTION_ARG_NAMES[funcName];
+      if (argNames && index < argNames.length) {
+        childNode.argumentName = argNames[index];
+      }
+      
+      return childNode;
+    });
 
     const node: FormulaNode = {
       type: 'function',

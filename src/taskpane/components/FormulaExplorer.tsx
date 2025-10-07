@@ -151,38 +151,56 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
     }
   };
 
-  renderFormulaNode = (node: FormulaNode, depth: number = 0): JSX.Element => {
+  renderFormulaNodeRow = (node: FormulaNode, depth: number = 0, index: string = '0'): JSX.Element[] => {
     const { selectedNode } = this.state;
     const isSelected = selectedNode === node;
     const isActive = node.isActive;
+    const rows: JSX.Element[] = [];
 
-    return (
-      <div
-        key={`${node.value}-${depth}`}
-        className={`formula-node ${isSelected ? 'selected' : ''} ${isActive ? 'active-branch' : ''}`}
-        style={{ marginLeft: `${depth * 20}px` }}
-        onClick={(e) => this.selectNode(node, e)}
+    // Render current node
+    rows.push(
+      <tr
+        key={`row-${index}`}
+        className={`formula-row ${isSelected ? 'selected' : ''} ${isActive ? 'active-branch' : ''}`}
+        onClick={(e) => { e.stopPropagation(); this.selectNode(node, e); }}
       >
-        <div className="node-header">
-          <span className={`node-type node-type-${node.type}`}>
-            {node.type === 'function' ? '𝑓' : node.type === 'reference' ? '📍' : '•'}
+        {/* Element Column */}
+        <td className="element-cell" style={{ paddingLeft: `${depth * 20 + 8}px` }}>
+          <span className="tree-icon">
+            {node.children && node.children.length > 0 ? '⊟' : ''}
           </span>
-          <span className="node-value">{node.value}</span>
-          {node.calculatedValue !== undefined && (
-            <span className="node-calculated-value">= {String(node.calculatedValue)}</span>
-          )}
-          {node.targetLocation && (
-            <span className="node-target-location">→ {node.targetLocation}</span>
-          )}
-        </div>
-        
-        {node.children && node.children.length > 0 && (
-          <div className="node-children">
-            {node.children.map((child, index) => this.renderFormulaNode(child, depth + 1))}
-          </div>
-        )}
-      </div>
+          <span className={`element-icon element-icon-${node.type}`}>
+            {node.type === 'function' ? '⚡' : node.type === 'reference' ? '📍' : '•'}
+          </span>
+          <span className="element-value">{node.value}</span>
+        </td>
+
+        {/* Info Column */}
+        <td className="info-cell">
+          {node.argumentName || (node.type === 'operator' ? 'operator' : '')}
+        </td>
+
+        {/* Value Column */}
+        <td className="value-cell">
+          {node.calculatedValue !== undefined ? String(node.calculatedValue) : ''}
+        </td>
+
+        {/* Location Column */}
+        <td className="location-cell">
+          {node.location || (node.address ? node.address : '')}
+        </td>
+      </tr>
     );
+
+    // Render children
+    if (node.children && node.children.length > 0) {
+      node.children.forEach((child, childIndex) => {
+        const childRows = this.renderFormulaNodeRow(child, depth + 1, `${index}-${childIndex}`);
+        rows.push(...childRows);
+      });
+    }
+
+    return rows;
   };
 
   render() {
@@ -202,92 +220,46 @@ export class FormulaExplorer extends React.Component<{}, FormulaExplorerState> {
     }
 
     return (
-      <div className="formula-explorer" onKeyDown={this.handleKeyDown}>
-        <div className="explorer-header">
-          <h2>Formula Explorer</h2>
-          <div className="cell-info">
-            <span className="cell-address">{currentCell.sheet}!{currentCell.address}</span>
-            <span className="cell-value">Value: {String(currentCell.value)}</span>
-          </div>
+      <div className="formula-explorer-modern" onKeyDown={this.handleKeyDown}>
+        {/* Formula Explorer Table - Main View */}
+        <div className="explorer-table-container">
+          <table className="explorer-table">
+            <thead>
+              <tr>
+                <th className="col-element">Element</th>
+                <th className="col-info">Info</th>
+                <th className="col-value">Value</th>
+                <th className="col-location">Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {formulaTree ? this.renderFormulaNodeRow(formulaTree) : (
+                <tr><td colSpan={4} className="no-formula-row">No formula to display</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
-        <div className="formula-tree-container">
-          <h3>Formula Structure</h3>
-          <div className="formula-tree">
-            {formulaTree ? this.renderFormulaNode(formulaTree) : <p>No formula to display</p>}
-          </div>
-        </div>
-
-        <div className="precedents-container">
-          <h3>Precedents ({selectedPrecedents.length})</h3>
-          <div className="precedents-list">
-            {selectedPrecedents.map((precedent, index) => (
-              <div key={index} className="precedent-item">
-                <span className="precedent-address">
-                  {precedent.sheet !== currentCell.sheet && `${precedent.sheet}!`}
-                  {precedent.address}
-                </span>
-                <span className="precedent-value">= {String(precedent.value)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="formula-editor-container">
-          <h3>Formula</h3>
+        {/* Formula Display at Bottom */}
+        <div className="formula-bottom-bar">
           {isEditing ? (
-            <div className="formula-editor">
+            <div className="formula-editor-inline">
               <textarea
                 ref={this.formulaInputRef}
-                className="formula-input"
+                className="formula-input-bottom"
                 value={editedFormula}
                 onChange={this.handleFormulaChange}
-                rows={3}
+                rows={2}
               />
-              <div className="editor-actions">
-                <button className="btn btn-primary" onClick={this.applyEdit}>
-                  Apply (Enter)
-                </button>
-                <button className="btn btn-secondary" onClick={this.cancelEdit}>
-                  Cancel (Esc)
-                </button>
-              </div>
+              <button className="btn-ok" onClick={this.applyEdit}>OK</button>
+              <button className="btn-cancel" onClick={this.cancelEdit}>Cancel</button>
             </div>
           ) : (
-            <div className="formula-display">
-              <code className="formula-code">{currentCell.formula}</code>
-              <button className="btn btn-secondary" onClick={this.startEditing}>
-                Edit (F2)
-              </button>
+            <div className="formula-display-bar">
+              <code className="formula-code-bottom">{currentCell.formula || '(No formula)'}</code>
+              <button className="btn-more" onClick={this.startEditing} title="Edit and expand formula">More ▼</button>
             </div>
           )}
-        </div>
-
-        <div className="explorer-actions">
-          <button className="btn btn-primary" onClick={this.loadCurrentCell}>
-            Refresh (Ctrl+Q)
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={async () => {
-              await Excel.run(async (context) => {
-                await KeyboardShortcutManager.navigateBack(context);
-              });
-            }}
-          >
-            Back (Ctrl+Backspace)
-          </button>
-        </div>
-
-        <div className="explorer-help">
-          <h4>Keyboard Shortcuts</h4>
-          <ul>
-            <li><kbd>Ctrl+Q</kbd> - Open Formula Explorer</li>
-            <li><kbd>F2</kbd> - Edit formula</li>
-            <li><kbd>Enter</kbd> - Apply changes</li>
-            <li><kbd>Esc</kbd> - Cancel / Close</li>
-            <li><kbd>Ctrl+Backspace</kbd> - Navigate back</li>
-          </ul>
         </div>
       </div>
     );

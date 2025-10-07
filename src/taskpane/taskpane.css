@@ -256,7 +256,241 @@ kbd {
   color: #6c757d;
 }
 
-/* Formula Explorer */
+/* Formula Explorer - Modern Table Design */
+.formula-explorer-modern {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.explorer-table-container {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.explorer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background-color: #fff;
+}
+
+.explorer-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #5a6b87;
+  color: white;
+  z-index: 10;
+}
+
+.explorer-table th {
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 600;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.explorer-table th:last-child {
+  border-right: none;
+}
+
+.col-element {
+  width: 35%;
+}
+
+.col-info {
+  width: 20%;
+}
+
+.col-value {
+  width: 25%;
+}
+
+.col-location {
+  width: 20%;
+}
+
+.explorer-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.15s;
+}
+
+.explorer-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.formula-row {
+  cursor: pointer;
+}
+
+.formula-row.selected {
+  background-color: #e7f3ff !important;
+}
+
+.formula-row.active-branch {
+  background-color: #fff3cd !important;
+  font-weight: 600;
+}
+
+.element-cell {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tree-icon {
+  width: 16px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.element-icon {
+  font-size: 16px;
+}
+
+.element-icon-function {
+  color: #667eea;
+}
+
+.element-icon-reference {
+  color: #28a745;
+}
+
+.element-icon-operator {
+  color: #ffc107;
+}
+
+.element-icon-literal {
+  color: #6c757d;
+}
+
+.element-value {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+}
+
+.info-cell {
+  padding: 8px;
+  color: #495057;
+  font-style: italic;
+}
+
+.value-cell {
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #212529;
+}
+
+.location-cell {
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  color: #667eea;
+  font-size: 12px;
+}
+
+.no-formula-row {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Formula Bottom Bar */
+.formula-bottom-bar {
+  border-top: 2px solid #dee2e6;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.formula-display-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.formula-code-bottom {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #212529;
+  background-color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.btn-more {
+  padding: 6px 12px;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #495057;
+  transition: all 0.2s;
+}
+
+.btn-more:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.formula-editor-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.formula-input-bottom {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1px solid #667eea;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 40px;
+}
+
+.btn-ok {
+  padding: 6px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.btn-ok:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  padding: 6px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Legacy Formula Explorer */
 .formula-explorer {
   display: flex;
   flex-direction: column;
